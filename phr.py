@@ -34,17 +34,17 @@ def get_card_input(deck, existing_cards):
         return None
 
 def get_user_hand(deck):
-    user_hand = []
-    while len(user_hand) < 2:
-        card = get_card_input(deck, user_hand)
+    existing_cards = set()
+    while len(existing_cards) < 2:
+        card = get_card_input(deck, existing_cards)
         if card:
-            user_hand.append(card)
+            existing_cards.add(card)
             deck.remove(card)
             print(f"{card} added to your hand.")
-    return user_hand
+    return existing_cards
 
 def get_river(deck):
-    river = []
+    river = set()
 
     # Flop Input
     input_flop = input("Enter flop details (y/n) ?").lower()
@@ -52,29 +52,29 @@ def get_river(deck):
         while len(river) < 3:
             card = get_card_input(deck, river)
             if card:
-                river.append(card)
+                river.add(card)
                 deck.remove(card)
                 print(f"{card} added to the flop.")
 
-    # Turn Input
-    input_turn = input("Enter turn details (y/n) ?").lower()
-    if input_turn == "y":
-        while len(river) < 4:
-            card = get_card_input(deck, river)
-            if card:
-                river.append(card)
-                deck.remove(card)
-                print(f"{card} added to the turn.")
+        # Turn Input
+        input_turn = input("Enter turn details (y/n) ?").lower()
+        if input_turn == "y":
+            while len(river) < 4:
+                card = get_card_input(deck, river)
+                if card:
+                    river.add(card)
+                    deck.remove(card)
+                    print(f"{card} added to the turn.")
 
-    # River Input
-    input_river = input("Enter river details (y/n) ?").lower()
-    if input_river == "y":
-        while len(river) < 5:
-            card = get_card_input(deck, river)
-            if card:
-                river.append(card)
-                deck.remove(card)
-                print(f"{card} added to the river.")
+            # River Input
+            input_river = input("Enter river details (y/n) ?").lower()
+            if input_river == "y":
+                while len(river) < 5:
+                    card = get_card_input(deck, river)
+                    if card:
+                        river.add(card)
+                        deck.remove(card)
+                        print(f"{card} added to the river.")
     return river
 
 
