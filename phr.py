@@ -83,7 +83,8 @@ def get_river(deck):
 Hand Type Condition Functions
 """
 
-def flush(hand, river):
+
+def flush(hand, river = set([])):
     combined_hand = hand.union(river)
     flush_list = []
     suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
@@ -93,7 +94,7 @@ def flush(hand, river):
             flush_list.append(sorted(suit_cards, key=lambda card: card.rank, reverse=True)[:5])
     return flush_list
 
-def straight(hand, river):
+def straight(hand, river = set([])):
     combined_hand = hand.union(river)
     straight_list = []
     ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
@@ -116,6 +117,16 @@ def straight(hand, river):
                 straight_list.append(cur_straight)
     return straight_list
 
+def straight_flush(hand, river):
+    combined_hand = hand.union(river)
+    flush_list = flush(combined_hand)
+    straight_flush_list = []
+    for flush_hand in flush_list:
+        straight_list = straight(set(flush_hand))
+        for consec in straight_list:
+            if len(set([card.suit for card in consec])) == 1:
+                straight_flush_list.append(consec)
+    return straight_flush_list
 
 def main():
     ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
@@ -139,15 +150,16 @@ def main():
     print("River:")
     for card in river:
         print(f"{card}")
+    
 
-
-    print(f"straight contains: ")
-    print(len(straight(user_hand, river)))
-    for i in range(len(straight(user_hand, river))):
-        for card in straight(user_hand, river)[i]:
-            # print(f"{card.rank}, {card.suit}")
-            print(f"{card}")
-        print("\n")
+    # Checks for: {Straight Flush}
+    if len(straight(user_hand, river)) > 0:
+        print(f"\nstraight flush contains: ")
+        for i in range(len(straight_flush(user_hand, river))):
+            for card in straight_flush(user_hand, river)[i]:
+                # print(f"{card.rank}, {card.suit}")
+                print(f"{card}")
+            print("\n")
     
 if __name__ == "__main__":
     main()
