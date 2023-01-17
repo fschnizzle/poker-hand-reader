@@ -1,3 +1,5 @@
+from collections import Counter
+
 class Card:
     def __init__(self, rank, suit):
         self.rank = rank
@@ -77,6 +79,21 @@ def get_river(deck):
                         print(f"{card} added to the river.")
     return river
 
+"""
+Hand Type Condition Functions
+"""
+
+def flush(hand, river):
+    combined_hand = hand.union(river)
+    flush_list = []
+    suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
+    for suit in suits:
+        suit_cards = [card for card in combined_hand if card.suit == suit]
+        if len(suit_cards) >= 5:
+            flush_list.append(sorted(suit_cards, key=lambda card: card.rank, reverse=True)[:5])
+    return flush_list
+
+
 
 
 def main():
@@ -103,6 +120,13 @@ def main():
     print("\n")
     print("River:")
     for card in river:
+        print(f"{card}")
+
+
+    print(f"flush contains: ")
+    print(len(flush(user_hand, river)))
+    for card in flush(user_hand, river)[0]:
+        # print(f"{card.rank}, {card.suit}")
         print(f"{card}")
     
 if __name__ == "__main__":
