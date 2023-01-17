@@ -93,7 +93,28 @@ def flush(hand, river):
             flush_list.append(sorted(suit_cards, key=lambda card: card.rank, reverse=True)[:5])
     return flush_list
 
-
+def straight(hand, river):
+    combined_hand = hand.union(river)
+    straight_list = []
+    ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
+    # Create a list of lists where each sublist contains all cards of a specific rank
+    rank_cards = [[card for card in combined_hand if card.rank == rank] for rank in ranks]
+    for i in range(len(ranks) - 4):
+        straight = []
+        for j in range(i, i + 5):
+            straight += rank_cards[j]
+        if len(straight) >= 5:
+            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.rank), card.suit), reverse=True)[:5]
+            if cur_straight not in straight_list:
+                straight_list.append(cur_straight)
+            # Check for a straight where Ace is the low card
+        if rank_cards[0] and rank_cards[-4]:
+            straight = rank_cards[0] + rank_cards[-4] + rank_cards[-3] + rank_cards[-2] + rank_cards[-1]
+        if len(straight) >= 5:
+            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.rank), card.suit), reverse=True)[:5]
+            if cur_straight not in straight_list:
+                straight_list.append(cur_straight)
+    return straight_list
 
 
 def main():
@@ -104,30 +125,29 @@ def main():
     # User prompted to enter their card details
     print("User Hand Card Details\n")
     user_hand = get_user_hand(deck)
-    print("\n")
 
     # User prompted to enter the river's card details
     print("River Card Details\n")
     river = get_river(deck)
 
     # Prints user hand
-    print("\n")
     print("Your hand:")
     for card in user_hand:
         print(f"{card}")
 
     # Prints river
-    print("\n")
     print("River:")
     for card in river:
         print(f"{card}")
 
 
-    print(f"flush contains: ")
-    print(len(flush(user_hand, river)))
-    for card in flush(user_hand, river)[0]:
-        # print(f"{card.rank}, {card.suit}")
-        print(f"{card}")
+    print(f"straight contains: ")
+    print(len(straight(user_hand, river)))
+    for i in range(len(straight(user_hand, river))):
+        for card in straight(user_hand, river)[i]:
+            # print(f"{card.rank}, {card.suit}")
+            print(f"{card}")
+        print("\n")
     
 if __name__ == "__main__":
     main()
