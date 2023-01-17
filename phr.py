@@ -128,6 +128,16 @@ def straight_flush(hand, river):
                 straight_flush_list.append(consec)
     return straight_flush_list
 
+def royal_flush(hand, river):
+    combined_hand = hand.union(river)
+    royal_flush_cards = {Card('Ace', 'Hearts'), Card('King', 'Hearts'), Card('Queen', 'Hearts'), Card('Jack', 'Hearts'), Card('10', 'Hearts')}
+    
+    for card in royal_flush_cards:
+        if card not in combined_hand:
+            return []
+    return [list(royal_flush_cards)]
+
+
 def main():
     ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
     suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
@@ -152,11 +162,11 @@ def main():
         print(f"{card}")
     
 
-    # Checks for: {Straight Flush}
+    # Checks for: {Royal Flush}
     if len(straight(user_hand, river)) > 0:
-        print(f"\nstraight flush contains: ")
-        for i in range(len(straight_flush(user_hand, river))):
-            for card in straight_flush(user_hand, river)[i]:
+        print(f"\nRoyal flush contains: ")
+        for i in range(len(royal_flush(user_hand, river))):
+            for card in royal_flush(user_hand, river)[i]:
                 # print(f"{card.rank}, {card.suit}")
                 print(f"{card}")
             print("\n")
