@@ -82,7 +82,85 @@ def get_river(deck):
 """
 Hand Type Condition Functions
 """
+def value_count(N, hand, river= set([])):
+    combined_hand = hand.union(river)
+    ranks = ['2','3','4','5','6','7','8','9','10','Jack','Queen','King','Ace']
+    value_count_list = []
+    for rank in ranks:
+        count = 0
+        rank_cards = []
+        for card in combined_hand:
+            if card.rank == rank:
+                count += 1
+                rank_cards.append(card)
+        if count == N:
+            value_count_list.append(rank_cards)
+    return value_count_list
 
+def complete_hand(sig_hand, hand, river):
+    combined_hand = hand.union(river)
+    final_hand = sig_hand.copy()
+    num_missing_cards = 5 - len(sig_hand)
+    remaining_cards = combined_hand.difference(sig_hand)
+    remaining_cards = sorted(remaining_cards, key=lambda card: card.rank, reverse=True)
+    final_hand.extend(remaining_cards[:num_missing_cards])
+    return final_hand
+
+def pair(hand, river=set([])):
+    combined_hand = hand.union(river)
+    rank_count = {}
+    for card in combined_hand:
+        if card.rank not in rank_count:
+            rank_count[card.rank] = 1
+        else:
+            rank_count[card.rank] += 1
+    final_list = []
+    for rank, count in rank_count.items():
+        if count >= 2:
+            pair_cards = [card for card in combined_hand if card.rank == rank]
+            other_cards = [card for card in combined_hand if card.rank != rank]
+            other_cards = sorted(other_cards, key=lambda card: card.rank, reverse=True)
+            final_sort = pair_cards + other_cards[:3]
+            if final_sort not in final_list:
+                final_list.append(final_sort)
+    return final_list
+
+def two_pair(hand, river=set([])):
+    combined_hand = hand.union(river)
+    rank_count = {}
+    for card in combined_hand:
+        if card.rank not in rank_count:
+            rank_count[card.rank] = 1
+        else:
+            rank_count[card.rank] += 1
+    pair_list = []
+    for rank, count in rank_count.items():
+        if count >= 2:
+            pair_cards = [card for card in combined_hand if card.rank == rank]
+            other_cards = [card for card in combined_hand if card.rank != rank]
+            pair_list.append(pair_cards)
+    two_pair_list = []
+    if len(pair_list) >= 2:
+        for i in range(len(pair_list)):
+            for j in range(i+1, len(pair_list)):
+                two_pair_hand = pair_list[i][:2] + pair_list[j][:2]
+                other_cards = [card for card in combined_hand if card not in two_pair_hand]
+                other_cards = sorted(other_cards, key=lambda card: card.rank, reverse=True)
+                final_sort = two_pair_hand + [other_cards[0]]
+                two_pair_list.append(final_sort)
+    return two_pair_list
+
+def three_of_a_kind(hand, river=set([])):
+    three_of_a_kind_list = value_count(3, hand, river)
+    for i in range(len(three_of_a_kind_list)):
+        three_of_a_kind_list[i] = complete_hand(three_of_a_kind_list[i][:3], hand, river)
+    return three_of_a_kind_list
+
+def four_of_a_kind(hand, river=set([])):
+    four_of_a_kind_list = value_count(4, hand, river)
+    for i in range(len(four_of_a_kind_list)):
+        four_of_a_kind_list[i] = complete_hand(four_of_a_kind_list[i][:4], hand, river)
+    return four_of_a_kind_list
 
 def flush(hand, river = set([])):
     combined_hand = hand.union(river)
@@ -162,11 +240,11 @@ def main():
         print(f"{card}")
     
 
-    # Checks for: {Royal Flush}
-    if len(straight(user_hand, river)) > 0:
-        print(f"\nRoyal flush contains: ")
-        for i in range(len(royal_flush(user_hand, river))):
-            for card in royal_flush(user_hand, river)[i]:
+    # Checks for: 4 of a kind}
+    if len(four_of_a_kind(user_hand, river)) > 0:
+        print(f"\nYou have a four_of_a_kind containing: ")
+        for i in range(len(four_of_a_kind(user_hand, river))):
+            for card in four_of_a_kind(user_hand, river)[i]:
                 # print(f"{card.rank}, {card.suit}")
                 print(f"{card}")
             print("\n")
