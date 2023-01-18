@@ -106,6 +106,13 @@ def complete_hand(sig_hand, hand, river):
     final_hand.extend(remaining_cards[:num_missing_cards])
     return final_hand
 
+def high_card(hand, river=set([])):
+    combined_hand = hand.union(river)
+    sorted_hand = sorted(combined_hand, key=lambda card: card.rank, reverse=True)
+    final_hand = []
+    final_hand.append(sorted_hand[0:5])
+    return final_hand
+
 def pair(hand, river=set([])):
     combined_hand = hand.union(river)
     rank_count = {}
@@ -263,10 +270,10 @@ def main():
     
 
     # Checks for: full_house}
-    if len(full_house(user_hand, river)) > 0:
+    if len(high_card(user_hand, river)) > 0:
         print(f"\nYou have a full house containing: ")
-        for i in range(len(full_house(user_hand, river))):
-            for card in full_house(user_hand, river)[i]:
+        for i in range(len(high_card(user_hand, river))):
+            for card in high_card(user_hand, river)[i]:
                 # print(f"{card.rank}, {card.suit}")
                 print(f"{card}")
             print("\n")
