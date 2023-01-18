@@ -1,7 +1,6 @@
 from collections import Counter
 
 ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
-
 class Card:
     def __init__(self, rank, suit):
         self.rank = rank
@@ -193,14 +192,14 @@ def straight(hand, river = set([])):
         for j in range(i, i + 5):
             straight += rank_cards[j]
         if len(straight) >= 5:
-            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.value), card.suit), reverse=True)[:5]
+            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.rank), card.suit), reverse=True)[:5]
             if cur_straight not in straight_list:
                 straight_list.append(cur_straight)
             # Check for a straight where Ace is the low card
         if rank_cards[0] and rank_cards[-4]:
             straight = rank_cards[0] + rank_cards[-4] + rank_cards[-3] + rank_cards[-2] + rank_cards[-1]
         if len(straight) >= 5:
-            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.value), card.suit), reverse=True)[:5]
+            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.rank), card.suit), reverse=True)[:5]
             if cur_straight not in straight_list:
                 straight_list.append(cur_straight)
     return straight_list
@@ -246,6 +245,15 @@ def full_house(hand, river=set([])):
     else:
         return []
 
+def determine_hand_type(hand, river):
+    hand_types = [royal_flush, straight_flush, four_of_a_kind, full_house, flush, straight, three_of_a_kind, two_pair, pair, high_card]
+    for hand_type in hand_types:
+        result = hand_type(hand, river)
+        if result:
+            hand_type_name = hand_type.__name__.replace("_", " ")
+            print(f"\nHand type: {hand_type_name}")
+            return result
+    print("No hand detected")
 
 
 def main():
@@ -257,29 +265,18 @@ def main():
     print("User Hand Card Details\n")
     user_hand = get_user_hand(deck)
 
+
     # User prompted to enter the river's card details
     print("River Card Details\n")
     river = get_river(deck)
 
-    # Prints user hand
-    print("Your hand:")
-    for card in user_hand:
-        print(f"{card}")
 
-    # Prints river
-    print("River:")
-    for card in river:
-        print(f"{card}")
-    
-
-    # Checks for: full_house}
-    if len(high_card(user_hand, river)) > 0:
-        print(f"\nYou have a full house containing: ")
-        for i in range(len(high_card(user_hand, river))):
-            for card in high_card(user_hand, river)[i]:
-                # print(f"{card.rank}, {card.suit}")
-                print(f"{card}")
-            print("\n")
+    # OUTPUT
+    best_hand = determine_hand_type(user_hand, river)[0]
+    print("Containing: ")
+    for card in best_hand:
+        print(f"  - {card}")
+    print("\n")
     
 if __name__ == "__main__":
     main()
