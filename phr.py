@@ -215,6 +215,28 @@ def royal_flush(hand, river):
             return []
     return [list(royal_flush_cards)]
 
+def full_house(hand, river=set([])):
+    combined_hand = hand.union(river)
+    rank_count = {}
+    for card in combined_hand:
+        if card.rank not in rank_count:
+            rank_count[card.rank] = 1
+        else:
+            rank_count[card.rank] += 1
+    three_of_a_kind = None
+    pair = None
+    for rank, count in rank_count.items():
+        if count == 3:
+            three_of_a_kind = [card for card in combined_hand if card.rank == rank]
+        elif count == 2:
+            pair = [card for card in combined_hand if card.rank == rank]
+    if three_of_a_kind is not None and pair is not None:
+        full_house_cards = three_of_a_kind + pair
+        return [sorted(full_house_cards, key=lambda card: card.rank, reverse=True)[:5]]
+    else:
+        return []
+
+
 
 def main():
     ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
@@ -240,11 +262,11 @@ def main():
         print(f"{card}")
     
 
-    # Checks for: 4 of a kind}
-    if len(four_of_a_kind(user_hand, river)) > 0:
-        print(f"\nYou have a four_of_a_kind containing: ")
-        for i in range(len(four_of_a_kind(user_hand, river))):
-            for card in four_of_a_kind(user_hand, river)[i]:
+    # Checks for: full_house}
+    if len(full_house(user_hand, river)) > 0:
+        print(f"\nYou have a full house containing: ")
+        for i in range(len(full_house(user_hand, river))):
+            for card in full_house(user_hand, river)[i]:
                 # print(f"{card.rank}, {card.suit}")
                 print(f"{card}")
             print("\n")
