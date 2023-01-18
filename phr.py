@@ -1,9 +1,12 @@
 from collections import Counter
 
+ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
+
 class Card:
     def __init__(self, rank, suit):
         self.rank = rank
         self.suit = suit
+        self.value = ranks.index(rank)
     def __str__(self):
         return f'{self.rank} of {self.suit}'
     def __eq__(self, other):
@@ -16,7 +19,7 @@ def get_card_input(deck, existing_cards):
     suit_input = card_input[-1].lower()
     rank_input = card_input[:-1].upper()
     suits = {'c': 'Clubs', 'd': 'Diamonds', 'h': 'Hearts', 's': 'Spades'}
-    ranks = {'A': 'Ace', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '10': '10', 'J': 'Jack', 'Q': 'Queen', 'K': 'King'}
+    ranks = {'2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '10': '10', 'J': 'Jack', 'Q': 'Queen', 'K': 'King', 'A': 'Ace'}
     if suit_input not in suits:
         print("Invalid suit input. Please enter a valid suit (c, d, h, s).")
         return None
@@ -102,13 +105,13 @@ def complete_hand(sig_hand, hand, river):
     final_hand = sig_hand.copy()
     num_missing_cards = 5 - len(sig_hand)
     remaining_cards = combined_hand.difference(sig_hand)
-    remaining_cards = sorted(remaining_cards, key=lambda card: card.rank, reverse=True)
+    remaining_cards = sorted(remaining_cards, key=lambda card: card.value, reverse=True)
     final_hand.extend(remaining_cards[:num_missing_cards])
     return final_hand
 
 def high_card(hand, river=set([])):
     combined_hand = hand.union(river)
-    sorted_hand = sorted(combined_hand, key=lambda card: card.rank, reverse=True)
+    sorted_hand = sorted(combined_hand, key=lambda card: card.value, reverse=True)
     final_hand = []
     final_hand.append(sorted_hand[0:5])
     return final_hand
@@ -126,7 +129,7 @@ def pair(hand, river=set([])):
         if count >= 2:
             pair_cards = [card for card in combined_hand if card.rank == rank]
             other_cards = [card for card in combined_hand if card.rank != rank]
-            other_cards = sorted(other_cards, key=lambda card: card.rank, reverse=True)
+            other_cards = sorted(other_cards, key=lambda card: card.value, reverse=True)
             final_sort = pair_cards + other_cards[:3]
             if final_sort not in final_list:
                 final_list.append(final_sort)
@@ -152,7 +155,7 @@ def two_pair(hand, river=set([])):
             for j in range(i+1, len(pair_list)):
                 two_pair_hand = pair_list[i][:2] + pair_list[j][:2]
                 other_cards = [card for card in combined_hand if card not in two_pair_hand]
-                other_cards = sorted(other_cards, key=lambda card: card.rank, reverse=True)
+                other_cards = sorted(other_cards, key=lambda card: card.value, reverse=True)
                 final_sort = two_pair_hand + [other_cards[0]]
                 two_pair_list.append(final_sort)
     return two_pair_list
@@ -176,7 +179,7 @@ def flush(hand, river = set([])):
     for suit in suits:
         suit_cards = [card for card in combined_hand if card.suit == suit]
         if len(suit_cards) >= 5:
-            flush_list.append(sorted(suit_cards, key=lambda card: card.rank, reverse=True)[:5])
+            flush_list.append(sorted(suit_cards, key=lambda card: card.value, reverse=True)[:5])
     return flush_list
 
 def straight(hand, river = set([])):
@@ -190,14 +193,14 @@ def straight(hand, river = set([])):
         for j in range(i, i + 5):
             straight += rank_cards[j]
         if len(straight) >= 5:
-            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.rank), card.suit), reverse=True)[:5]
+            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.value), card.suit), reverse=True)[:5]
             if cur_straight not in straight_list:
                 straight_list.append(cur_straight)
             # Check for a straight where Ace is the low card
         if rank_cards[0] and rank_cards[-4]:
             straight = rank_cards[0] + rank_cards[-4] + rank_cards[-3] + rank_cards[-2] + rank_cards[-1]
         if len(straight) >= 5:
-            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.rank), card.suit), reverse=True)[:5]
+            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.value), card.suit), reverse=True)[:5]
             if cur_straight not in straight_list:
                 straight_list.append(cur_straight)
     return straight_list
@@ -239,7 +242,7 @@ def full_house(hand, river=set([])):
             pair = [card for card in combined_hand if card.rank == rank]
     if three_of_a_kind is not None and pair is not None:
         full_house_cards = three_of_a_kind + pair
-        return [sorted(full_house_cards, key=lambda card: card.rank, reverse=True)[:5]]
+        return [sorted(full_house_cards, key=lambda card: card.value, reverse=True)[:5]]
     else:
         return []
 
