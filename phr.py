@@ -81,8 +81,18 @@ def get_river(deck):
                         print(f"{card} added to the river.")
     return river
 
+def determine_hand_type(hand, river):
+    hand_types = [royal_flush, straight_flush, four_of_a_kind, full_house, flush, straight, three_of_a_kind, two_pair, pair, high_card]
+    for hand_type in hand_types:
+        result = hand_type(hand, river)
+        if result:
+            hand_type_name = hand_type.__name__.replace("_", " ")
+            print(f"\nHand type: {hand_type_name}")
+            return result
+    print("No hand detected")
+
 """
-Hand Type Condition Functions
+Helper Functions
 """
 def value_count(N, hand, river= set([])):
     combined_hand = hand.union(river)
@@ -108,6 +118,9 @@ def complete_hand(sig_hand, hand, river):
     final_hand.extend(remaining_cards[:num_missing_cards])
     return final_hand
 
+"""
+Hand type functions
+"""
 def high_card(hand, river=set([])):
     combined_hand = hand.union(river)
     sorted_hand = sorted(combined_hand, key=lambda card: card.value, reverse=True)
@@ -204,26 +217,6 @@ def straight(hand, river = set([])):
                 straight_list.append(cur_straight)
     return straight_list
 
-def straight_flush(hand, river):
-    combined_hand = hand.union(river)
-    flush_list = flush(combined_hand)
-    straight_flush_list = []
-    for flush_hand in flush_list:
-        straight_list = straight(set(flush_hand))
-        for consec in straight_list:
-            if len(set([card.suit for card in consec])) == 1:
-                straight_flush_list.append(consec)
-    return straight_flush_list
-
-def royal_flush(hand, river):
-    combined_hand = hand.union(river)
-    royal_flush_cards = {Card('Ace', 'Hearts'), Card('King', 'Hearts'), Card('Queen', 'Hearts'), Card('Jack', 'Hearts'), Card('10', 'Hearts')}
-    
-    for card in royal_flush_cards:
-        if card not in combined_hand:
-            return []
-    return [list(royal_flush_cards)]
-
 def full_house(hand, river=set([])):
     combined_hand = hand.union(river)
     rank_count = {}
@@ -244,16 +237,28 @@ def full_house(hand, river=set([])):
         return [sorted(full_house_cards, key=lambda card: card.value, reverse=True)[:5]]
     else:
         return []
+        
+def straight_flush(hand, river):
+    combined_hand = hand.union(river)
+    flush_list = flush(combined_hand)
+    straight_flush_list = []
+    for flush_hand in flush_list:
+        straight_list = straight(set(flush_hand))
+        for consec in straight_list:
+            if len(set([card.suit for card in consec])) == 1:
+                straight_flush_list.append(consec)
+    return straight_flush_list
 
-def determine_hand_type(hand, river):
-    hand_types = [royal_flush, straight_flush, four_of_a_kind, full_house, flush, straight, three_of_a_kind, two_pair, pair, high_card]
-    for hand_type in hand_types:
-        result = hand_type(hand, river)
-        if result:
-            hand_type_name = hand_type.__name__.replace("_", " ")
-            print(f"\nHand type: {hand_type_name}")
-            return result
-    print("No hand detected")
+def royal_flush(hand, river):
+    combined_hand = hand.union(river)
+    royal_flush_cards = {Card('Ace', 'Hearts'), Card('King', 'Hearts'), Card('Queen', 'Hearts'), Card('Jack', 'Hearts'), Card('10', 'Hearts')}
+    
+    for card in royal_flush_cards:
+        if card not in combined_hand:
+            return []
+    return [list(royal_flush_cards)]
+
+
 
 
 def main():
