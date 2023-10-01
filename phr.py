@@ -197,25 +197,26 @@ def flush(hand, river = set([])):
 def straight(hand, river = set([])):
     combined_hand = hand.union(river)
     straight_list = []
-    ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
-    # Create a list of lists where each sublist contains all cards of a specific rank
-    rank_cards = [[card for card in combined_hand if card.rank == rank] for rank in ranks]
+    ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
+    unique_ranks_in_hand = {card.rank for card in combined_hand}
+    
     for i in range(len(ranks) - 4):
-        straight = []
-        for j in range(i, i + 5):
-            straight += rank_cards[j]
-        if len(straight) >= 5:
-            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.rank), card.suit), reverse=True)[:5]
-            if cur_straight not in straight_list:
-                straight_list.append(cur_straight)
-            # Check for a straight where Ace is the low card
-        if rank_cards[0] and rank_cards[-4]:
-            straight = rank_cards[0] + rank_cards[-4] + rank_cards[-3] + rank_cards[-2] + rank_cards[-1]
-        if len(straight) >= 5:
-            cur_straight = sorted(straight, key=lambda card: (ranks.index(card.rank), card.suit), reverse=True)[:5]
-            if cur_straight not in straight_list:
-                straight_list.append(cur_straight)
+        is_straight = all(ranks[j] in unique_ranks_in_hand for j in range(i, i + 5))
+        if is_straight:
+            straight_cards = [card for card in combined_hand if card.rank in ranks[i:i+5]]
+            sorted_straight = sorted(straight_cards, key=lambda card: ranks.index(card.rank), reverse=True)[:5]
+            straight_list.append(sorted_straight)
+            
+    # Special case: Straight with Ace as the low card ('5', '4', '3', '2', 'Ace')
+    if all(rank in unique_ranks_in_hand for rank in ['2', '3', '4', '5', 'Ace']):
+        straight_cards = [card for card in combined_hand if card.rank in ['2', '3', '4', '5', 'Ace']]
+        sorted_straight = sorted(straight_cards, key=lambda card: ranks.index(card.rank), reverse=True)
+        # Place the Ace at the end
+        sorted_straight = sorted_straight[:-1] + [sorted_straight[-1]]
+        straight_list.append(sorted_straight)
+    
     return straight_list
+
 
 def full_house(hand, river=set([])):
     combined_hand = hand.union(river)
